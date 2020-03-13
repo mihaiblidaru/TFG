@@ -1,0 +1,104 @@
+
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+#collapsibleNavbar {
+    justify-content: flex-end;
+}
+
+body {
+    margin-top: 65px;
+}
+
+footer {
+    position: fixed;
+    bottom: 0;
+    background-color: #f5f5f5;
+    width: 100%;
+    z-index: 10;
+}
+
+.pagination {
+    display: flex;
+    padding-left: 0px;
+    list-style: none;
+    border-radius: 0.25rem;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.hidden_cattegory {
+    display: none;
+}
+
+textarea {
+    resize: none;
+}
+
+.row.vdivide [class*='col-']:not(:last-child):after {
+    background: #e0e0e0;
+    width: 1px;
+    content: "";
+    display: block;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    min-height: 70px;
+}
+
+.dropdown-menu{
+    max-width: 80vw !important;
+    overflow-x: hidden;
+}
+.popover {
+    min-width: 400px;
+}
+
+.popover-short {
+    min-width: initial;
+}
+
+.wrapword{
+   /* These are technically the same, but use both */
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  -ms-word-break: break-all;
+  /* This is the dangerous one in WebKit, as it breaks things wherever */
+    word-break: break-all;
+  /* Instead use this non-standard one: */
+  word-break: break-word;
+
+  /* Adds a hyphen where the word breaks, if supported (No Blink) */
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+
+    }
+
+.errorlist{
+    list-style: none;
+    padding-left: 15px;
+    color: #dc3545;
+}
+
+.errorlist li::before{
+    color: #dc3545;  
+    /* color of bullet or square */
+  
+    content: "\00d7"; 
+    /* Unicode of character to precede the list item */
+  
+    font-size: 1.2em; 
+    /* em or %*/
+   
+    padding-right: 0.3225em; 
+    /* use em*/
+  
+    position: relative;
+    top: 0em; 
+}

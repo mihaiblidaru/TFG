@@ -1,0 +1,77 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="icon" type="image/png" href="{% static "images/favicon.png" %}" />
+
+    <title>YANG Netconf - {% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
+        crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU"
+        crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static "css/base.css" %}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+        crossorigin="anonymous"></script>
+
+    {% block scripts %}
+
+
+
+    {% endblock scripts %}
+</head>
+
+<body>
+    {% block header %}
+
+    <nav class="navbar fixed-top navbar-expand-md bg-dark navbar-dark">
+        <a class="navbar-brand" href="{% url 'index' %}">YANG Netconf</a>
+
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="collapsibleNavbar">
+
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'index' %}">Home</a>
+                </li>
+                <!--<li class="nav-item">
+                    <a class="nav-link" href="#" data-toggle="modal" data-target="#myModal">Help</a>
+                </li>
+                -->
+
+            </ul>
+        </div>
+    </nav>
+
+
+    {% endblock header %}
+
+    {% block help_modal %}
+    {% endblock help_modal %}
+
+
+    {% block content %} {% endblock content %}
+
+    {% block footer %}
+    <footer class="mt-5">
+            <div class="container-fluid">
+                    <div class="row">
+                        <div class="col text-center text-muted">
+                            Mihai Blidaru, Adrian Rubio <i class="far fa-copyright"></i> EPS 2018
+                        </div>
+                    </div>
+                </div>
+          </footer>
+    {% endblock footer %}
+</body>
+
+</html>

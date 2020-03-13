@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load static  %}
+
+{% block title %}
+    Hosts
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid main_content mb-5">
+    <div class="row">
+        <div class="col-xs-6 col-md-12 col-lg-12 mb-3">
+            <h3 class="ml-3">Hosts</h3>
+            {% if hosts %}
+            <ul class="list-group">
+                {% for host in hosts %}
+                <li class="wrapword list-group-item">
+                    <div class="d-inline align-middle">
+                        <span class="font-weight-bold">
+                                <a href="#">{{host.name}}</a> -
+                        </span>
+                        {{host.ip}}:{{ host.port }} - {{ host.subscription_set.count }} subscriptions
+                    </div>
+                    <div class="float-right">
+                        <a class="btn btn-primary" href="{%   url 'show_host' host.slug %}" role="button">Edit</a>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+
+            {% if error %}
+                <div class="alert alert-danger" role="alert">
+                    <span class="h5">{{error}}</span>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+

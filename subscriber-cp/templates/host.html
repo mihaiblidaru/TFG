@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load static  %}
+
+{% block title %}
+    Hosts
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid main_content mb-5">
+    <div class="row">
+        <div class="col-xs-6 col-md-12 col-lg-12 mb-3">
+            <div class="m-2">
+                <h3 class="d-inline ml-3">Subscriptions for {{host.name}} - {{host.ip}}:{{ host.port }}</h3>
+                <div class="d-inline">
+                    {% if online %}
+                        <span class="badge badge-success">Online</span>
+                    {% else %}
+                        <span class="badge badge-danger">Offline</span>
+                    {% endif %}
+                </div>
+                <div class="float-right">
+                    <a class="btn btn-primary" href="#" role="button"><i class="mr-2 fa fa-plus-square"></i>Add Subscription</a>
+                </div>
+            </div>
+            {% if host.subscription_set.count > 0 %}
+                <ul class="list-group">
+                    {% for subscription in host.subscription_set.all %}
+                    <li class="wrapword list-group-item">
+                        <div class="d-inline align-middle">
+                            id = {{  subscription.id }}, type = {{subscription.type}}, data = {{ subscription.data }}
+                        </div>
+                        <div class="float-right">
+                            <a class="btn btn-danger" href="{%   url 'show_host' host.slug %}" role="button"> <i class="mr-2 fa fa-trash"/></i> Delete</a>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+             <div class="alert alert-danger" role="alert">
+                    <span class="h5">No subscriptions for this host</span>
+                </div>
+            {% endif %}
+
+            {% if error %}
+                <div class="alert alert-danger" role="alert">
+                    <span class="h5">{{error}}</span>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+

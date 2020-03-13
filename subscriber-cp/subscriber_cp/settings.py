@@ -76,6 +76,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'subscriber_cp.wsgi.application'
 
+STATICFILES_DIRS = [STATIC_DIR, ]
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases

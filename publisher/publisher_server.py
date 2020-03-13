@@ -9,11 +9,11 @@ nsmap_update({'pfx': MODEL_NS})
 
 class MyServer (object):
     def __init__ (self, user, pw):
-        server_ctl = server.SSHUserPassController(username=getpass.getuser(), password="admin")
+        server_ctl = server.SSHUserPassController(username='admin', password="admin")
         nc_server = server.NetconfSSHServer(server_ctl=server_ctl,
                                             server_methods=self,
                                             port=55555,
-                                            host_key="tests/host_key",
+                                            host_key="ssh/id_rsa",
                                             debug=True)
 
     def nc_append_capabilities(self, caps):
