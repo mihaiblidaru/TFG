@@ -42,5 +42,6 @@ class Subscription(models.Model):
     host = models.ForeignKey(Host, on_delete=models.DO_NOTHING)
     type = models.CharField(max_length=100, default='periodic')
     data = models.CharField(max_length=100)
+    interval = models.PositiveIntegerField(default=10000)
 
 

@@ -20,7 +20,7 @@
                     {% endif %}
                 </div>
                 <div class="float-right">
-                    <a class="btn btn-primary" href="#" role="button"><i class="mr-2 fa fa-plus-square"></i>Add Subscription</a>
+                    <a class="btn btn-primary" href="{% url 'add_subscription' host.slug %}" role="button"><i class="mr-2 fa fa-plus-square"></i>Add Subscription</a>
                 </div>
             </div>
             {% if host.subscription_set.count > 0 %}
@@ -28,10 +28,10 @@
                     {% for subscription in host.subscription_set.all %}
                     <li class="wrapword list-group-item">
                         <div class="d-inline align-middle">
-                            id = {{  subscription.id }}, type = {{subscription.type}}, data = {{ subscription.data }}
+                            id = {{  subscription.id }}, type = {{subscription.type}}, data = {{ subscription.data }}, interval = {{ subscription.interval }}
                         </div>
                         <div class="float-right">
-                            <a class="btn btn-danger" href="{%   url 'show_host' host.slug %}" role="button"> <i class="mr-2 fa fa-trash"/></i> Delete</a>
+                            <a class="btn btn-danger" href="{%   url 'del_subscription' host.slug subscription.id %}" role="button"> <i class="mr-2 fa fa-trash"/></i> Delete</a>
                         </div>
                     </li>
                     {% endfor %}
