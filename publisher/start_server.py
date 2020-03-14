@@ -5,6 +5,7 @@ import time
 def main():
     svr = PublisherServer("admin", "admin")
 
+    print(f"Netconf server listening on port {svr.port}")
     try:
         while True:
             time.sleep(200)

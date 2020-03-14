@@ -16,9 +16,10 @@ nsmap_update({'pfx': MODEL_NS, 'yp': 'urn:ietf:params:xml:ns:yang:ietf-yang-push
 
 
 class PublisherServer (object):
-    def __init__(self, user, pw, storage_file='subscriptions.json'):
+    def __init__(self, user, pw, port=55555, storage_file='subscriptions.json'):
         self.storage_file = storage_file
         self.subscriptions = []
+        self.port = port
         self.load_subscriptions_file()
         self._storage_file_lock = Lock()
         server_ctl = server.SSHUserPassController(
