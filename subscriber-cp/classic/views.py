@@ -4,6 +4,14 @@ from django.shortcuts import render, redirect
 from netconf.client import NetconfSSHSession
 from classic.forms import AddSubscriptionForm, AddHost
 from data.models import Host, Subscription
+import lxml
+from netconf import util
+from netconf import nsmap_update
+
+MODEL_NS = "urn:my-urn:my-model"
+
+nsmap_update({'yp': 'urn:ietf:params:xml:ns:yang:ietf-yang-push',
+              'ds': 'urn:ietf:params:xml:ns:yang:ietf-datastores'})
 
 
 def add_host(request):
@@ -29,24 +37,23 @@ def del_subscription(resquest, slug, sub_id):
 
 def try_establish_subscription(host, data):
     session = NetconfSSHSession(host.ip, username="admin", password="admin", port=host.port, debug=True)
-    query = f"""
-        <establish-subscription
-        xmlns="urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications"
-        xmlns:yp="urn:ietf:params:xml:ns:yang:ietf-yang-push">
-        <yp:datastore
-            xmlns:ds="urn:ietf:params:xml:ns:yang:ietf-datastores">
-        ds:operational
-        </yp:datastore>
-        <yp:datastore-xpath-filter
-            xmlns:ex="https://example.com/sample-data/1.0">
-        {data['data']}
-        </yp:datastore-xpath-filter>
-        <yp:periodic>
-        <yp:period>{data['interval']}</yp:period>
-        </yp:periodic>
-        </establish-subscription>
-    """
-    rval = session.send_rpc(query)
+
+    es_nsmap = {'yp': 'urn:ietf:params:xml:ns:yang:ietf-yang-push'}
+    root = lxml.etree.Element('establish-subscription', nsmap=es_nsmap,
+                              attrib={'xmlns': 'urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications'})
+
+    datastore = util.leaf_elm('yp:datastore', 'ds:operational')
+    root.append(datastore)
+
+    datastore_xpath_filter = util.leaf_elm('yp:datastore-xpath-filter', data['data'])
+
+    root.append(datastore_xpath_filter)
+
+    periodic = util.subelm(root, 'yp:periodic')
+    period = util.leaf_elm("yp:period", 500)
+    periodic.append(period)
+
+    rval = session.send_rpc(root)
 
     session.close()
 
