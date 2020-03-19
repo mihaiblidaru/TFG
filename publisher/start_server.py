@@ -3,7 +3,7 @@ import time
 
 
 def main():
-    svr = PublisherServer("admin", "admin")
+    svr = PublisherServer("admin", "admin", debug=True)
 
     print(f"Netconf server listening on port {svr.port}")
     try:
