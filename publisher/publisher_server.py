@@ -31,11 +31,11 @@ class PublisherServer:
         self.debug = cfg.debug
         self._storage_file_lock = Lock()
 
-        self.client = MongoClient("mongodb://localhost:27017/?readPreference=primary&appname=netconf-publisher&ssl=false", serverSelectionTimeoutMS=2000)
+        self.client = MongoClient(f"mongodb://{cfg.mongo_host}:{cfg.mongo_port}/?readPreference=primary&appname=netconf-publisher&ssl=false", serverSelectionTimeoutMS=2000)
         
         # Test mongoDB connection. Fails if could not connect to any mongodb server and raises an exception
         self.client.server_info()
-        self.db = self.client['netconf']
+        self.db = self.client[cfg.mongo_db]
 
         # Authentication
         #
