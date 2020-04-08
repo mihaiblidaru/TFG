@@ -9,7 +9,7 @@ bibtex main
 makeglossaries main
 pdflatex main.tex
 pdflatex main.tex
-mv main.pdf "Trabajo de Fin de Grado.pdf"
+mv main.pdf "Trabajo_Fin_De_Grado.pdf"
 
 # Limpiar archivos auxiliares
 ./limpiar.sh
