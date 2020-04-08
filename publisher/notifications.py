@@ -6,6 +6,9 @@ import time
 from datetime import datetime
 import json
 import xmljson
+import logging
+
+logger = logging.getLogger("publisher")
 
 class Subscription():
 
@@ -99,11 +102,12 @@ class PeriodicNotificationThread:
         thread.start()
         
     def send_periodic_notification(self, sub, db, session):
+        logger.debug("New periodic subscription thread started")
 
         while self.keep_active:
             # If the session is still open send notification
             if session.session_open:
-                print(f"Sending notification for subid {sub.sid}") # TODO use logger instead of prints
+                logger.debug(f"Sending notification for subid {sub.sid}")
 
                 nsmap = {None:'urn:ietf:params:xml:ns:netconf:notification:1.0'}
                 root = ET.Element('notification', nsmap=nsmap)
@@ -126,7 +130,7 @@ class PeriodicNotificationThread:
 
                 ucode = ET.tounicode(root, pretty_print=True)
 
-                print(ucode)
+                logger.debug(ucode)
 
                 # TODO: do not access the low level method directly
                 session.send_message(ucode)

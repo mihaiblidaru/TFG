@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 from publisher_server import PublisherServer
 import time
 import os
@@ -8,7 +9,6 @@ class Parser(ArgumentParser):
 
     def __init__(self, prog):
         super().__init__(prog, description=self.help_str)
-
         self.add_argument('-c', '--conf', required=False, default="server_config.json", help='Netconf server config file'),
 
     def parse_argv(self):
@@ -16,13 +16,11 @@ class Parser(ArgumentParser):
 
 
 def main():
-
     parser = Parser(__file__)
     args = parser.parse_args()
 
     svr = PublisherServer(args.conf)
 
-    print(f"Netconf server listening on port {svr.port}")
     try:
         while True:
             time.sleep(200)

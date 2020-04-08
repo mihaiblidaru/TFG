@@ -11,6 +11,9 @@ from notifications import PeriodicNotificationThread
 from pymongo import MongoClient
 from pymongo import MongoClient
 
+import logging
+
+logger = None
 
 # TODO model namespace??
 MODEL_NS = "urn:my-urn:my-model"
@@ -24,9 +27,32 @@ class PublisherServer:
         :param config_file: server config file path
         :param debug:
         """
+        # read configuration
         cfg = read_json_config_file(config_file)
+        
+        # Set up logger
+        global logger
+        logger = logging.getLogger('publisher')
+        logger.setLevel(logging.DEBUG)
 
-        self.subscriptions = []
+        # create file handler which logs all messages
+        fh = logging.FileHandler('publisher_debug.log')
+        fh.setLevel(logging.DEBUG)
+
+        ch_level = logging.DEBUG if cfg.debug else logging.INFO
+        # create console handler with a higher log level
+        ch = logging.StreamHandler()
+        ch.setLevel(ch_level)
+
+        formatter = logging.Formatter('%(asctime)s %(name)s %(threadName)s %(levelname)s: %(message)s')
+        fh.setFormatter(formatter)
+        ch.setFormatter(formatter)
+
+        logger.addHandler(fh)
+        logger.addHandler(ch)
+        
+        self.subscriptions = {}
+        self.last_subscription_id = 0
         self.port = cfg.port
         self.debug = cfg.debug
         self._storage_file_lock = Lock()
@@ -34,13 +60,17 @@ class PublisherServer:
         self.client = MongoClient(f"mongodb://{cfg.mongo_host}:{cfg.mongo_port}/?readPreference=primary&appname=netconf-publisher&ssl=false", serverSelectionTimeoutMS=2000)
         
         # Test mongoDB connection. Fails if could not connect to any mongodb server and raises an exception
-        self.client.server_info()
+        try:
+            self.client.server_info()
+        except Exception as e:
+            logger.error(f"MongoDB error: {e}")
+            raise e
         self.db = self.client[cfg.mongo_db]
 
         # Authentication
         #
         # There are two available authentication methods:
-        #    1. User and password (used now), only one user
+        #    1. User and password (used now), allowing only one user (no way to establish access rules)
         #    2. SSH authorized keys. A list of the allowed clients public keys
         auth_controller = server.SSHUserPassController(username=cfg.username, password=cfg.password)
 
@@ -49,6 +79,9 @@ class PublisherServer:
                                 port=cfg.port,
                                 host_key=cfg.ssh_host_key_path,
                                 debug=cfg.debug)
+
+        logger.info(f"Server started on port {self.port}")
+
 
     def nc_append_capabilities(self, caps):
         # TODO netconf server capabilities
@@ -95,6 +128,8 @@ class PublisherServer:
         # We have recieved an establish-subscription rpc
         # TODO validate more fields from the RPC 
 
+        logger.info("Received establish-subscription RPC")
+
         sub_type = None
 
         root = rpc[0]
@@ -122,7 +157,7 @@ class PublisherServer:
             sid = self.get_next_sub_id()
             sub = Subscription(sid, sub_type, datastore, xpath_filter, interval=period,
                                raw=ET.tostring(rpc, pretty_print=True).decode('utf8'))
-            self.add_subcription(sub)
+            self.subscriptions[sid] = sub
 
         # Generate response
         res_map = {None: 'urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications'}
@@ -130,22 +165,14 @@ class PublisherServer:
         # id tag containing the subscription id
         res = ET.Element('id', nsmap=res_map)
         res.text = str(sid)
-        if self.debug:
-            print(ET.tostring(rpc, pretty_print=True).decode('utf8'))
-        if self.debug:
-            print(ET.tostring(res, pretty_print=True).decode('utf8'))
+        
+        logger.debug(ET.tostring(rpc, pretty_print=True).decode('utf8'))
+        logger.debug(ET.tostring(res, pretty_print=True).decode('utf8'))
 
         PeriodicNotificationThread(sub, self.db, session)
 
         return res
 
     def get_next_sub_id(self):
-        sid = 1
-        if self.subscriptions:
-            sid = max(map(lambda x: x.sid, self.subscriptions)) + 1
-
-        return sid
-
-    def add_subcription(self, sub):
-        self.subscriptions.append(sub)
-
+        self.last_subscription_id += 1
+        return self.last_subscription_id
