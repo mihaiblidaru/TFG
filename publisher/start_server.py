@@ -1,9 +1,9 @@
 from publisher_server import PublisherServer
 import time
-
+import os
 
 def main():
-    svr = PublisherServer("admin", "admin", debug=True)
+    svr = PublisherServer()
 
     print(f"Netconf server listening on port {svr.port}")
     try:

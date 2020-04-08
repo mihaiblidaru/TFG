@@ -50,12 +50,18 @@ def try_establish_subscription(host, data):
     root.append(datastore_xpath_filter)
 
     periodic = util.subelm(root, 'yp:periodic')
-    period = util.leaf_elm("yp:period", 500)
+    period = util.leaf_elm("yp:period", data['interval'])
     periodic.append(period)
 
     rval = session.send_rpc(root)
 
-    session.close()
+    while True:
+        notif = session._receive_message()
+        print(notif)
+
+    #rval = session.send_rpc(root)
+
+    #session.close()
 
 
 def add_subscription(request, slug):
