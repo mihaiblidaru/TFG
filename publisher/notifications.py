@@ -109,12 +109,8 @@ class PeriodicNotificationThread:
             if session.session_open:
                 logger.debug(f"Sending notification for subid {sub.sid}")
 
-                nsmap = {None:'urn:ietf:params:xml:ns:netconf:notification:1.0'}
-                root = ET.Element('notification', nsmap=nsmap)
+                push_update = ncutil.elm("push-update")
 
-                eventTime = ncutil.subelm(root, "eventTime")
-                eventTime.text = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
-                push_update = ncutil.subelm(root, "push-update")
                 # Set notification id
                 ncutil.subelm(push_update, "id").text = str(sub.sid)
                 datastore_contents = ncutil.subelm(push_update, "datastore-contents")
@@ -128,12 +124,9 @@ class PeriodicNotificationThread:
                 for elem in notif_data:
                     datastore_contents.append(elem)
 
-                ucode = ET.tounicode(root, pretty_print=True)
-
-                logger.debug(ucode)
 
                 # TODO: do not access the low level method directly
-                session.send_message(ucode)
+                session.send_notification(push_update)
                 time.sleep(sub.interval)
             else:
                 self.keep_active = False

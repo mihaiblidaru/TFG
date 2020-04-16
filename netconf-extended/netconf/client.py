@@ -34,6 +34,8 @@ from queue import Queue
 
 logger = logging.getLogger(__name__)
 
+YP_PERIODIC = 1
+YP_ONCHANGE = 2
 
 def _is_filter(select):
     return select.lstrip().startswith("<")
@@ -215,6 +217,51 @@ class NetconfClientSession(NetconfSession):
 
     def get_notification(self, block=True, timeout=None):
         return self.notifications.get(block, timeout)
+
+    def send_yp_establish_subscription(self, sub_type, datastore, **kwargs):
+        # Trying to respect RPC format the defined yang model in
+        # ietf-yang-push@2019-09-09.yang and ietf-subscribed-notifications@2019-09-09.yang
+        
+        # Establish subscription RPC needs a target. This can be either a stream or a 
+        # yang push datastore. In this case we asume we are working with a yang-push capable server.
+
+        if datastore is None:
+            raise ValueError("datastore can not be None. Expected identityref")
+
+        # The next mandatory parameter is a selection-filter. This can be a reference to a filter
+        # type (selection-filter-ref), a yp:datastore-subtree-filter or a yp:datastore-xpath-filter
+        #
+        # TODO: Check what is a filter-reference and a subtree-filter. Right now I will work only 
+        # with xpath-filter
+
+
+        # Validate type arguments
+        norm_type = sub_type.lower()
+        _type = None
+        if norm_type == 'periodic':
+            _type = YP_PERIODIC
+        elif norm_type == 'on-change':
+            _type = YP_ONCHANGE
+        else:
+            raise ValueError("Subscription type %s not supported. Use 'on-change' or 'periodic'")
+
+        if _type == YP_PERIODIC:
+            # If subscription is periodic
+            if 'period' not in kwargs:
+                raise ValueError("You have to specify the period for periodic subscriptions")
+            
+            period = float(kwargs['period'])
+            if period < 0:
+                raise ValueError("Period must me a positive number of centiseconds")
+
+        if _type == YP_ONCHANGE:
+            # optional dampening-period 
+            # optional sync-on-start (send me a notification right after accepting the subscription)
+            # optional excluded-change (exclude one type of change) for instance if you don't want to
+            # receive notifications when an object is deleted, the value of this parameter would be "delete".
+            # Posible options are create, delete, insert, move and replace.
+        pass
+
 
     def send_rpc(self, rpc, timeout=None):
         """Send a generic RPC to the server and await the reply.

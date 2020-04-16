@@ -135,3 +135,6 @@ dmypy.json
 .pytype/
 
 .idea
+
+# do not reupload yang models
+*.yang

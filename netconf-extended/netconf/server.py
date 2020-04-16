@@ -21,6 +21,7 @@ import io
 import logging
 import os
 import sys
+from datetime import datetime
 import threading
 import paramiko as ssh
 from lxml import etree
@@ -258,6 +259,18 @@ class NetconfServerSession(base.NetconfSession):
 
         if self.debug:
             logger.debug("%s: Closed.", str(self))
+
+    def send_notification(self, notification_data):
+        nsmap = {None:'urn:ietf:params:xml:ns:netconf:notification:1.0'}
+        notification = etree.Element('notification', nsmap=nsmap)
+        eventTime = util.subelm(notification, "eventTime")
+        eventTime.text = datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
+        notification.append(notification_data)
+        ucode = etree.tounicode(notification, pretty_print=True)
+        if self.debug:
+            logger.debug("%s: Sending Notification: %s", str(self), str(ucode))
+        
+        self.send_message(ucode)
 
     # ----------------
     # Internal Methods

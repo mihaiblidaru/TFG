@@ -25,7 +25,20 @@ cd ..
 ```
 
 
+## How to build & run docker publisher module
 
+```
+cd publisher
+# change mongo host in server_config_docker.json
+docker build -t publisher
+docker run -d publisher
+```
+
+# Probably usefull modules
+```
+https://github.com/robshakir/pyangbind
+
+```
 
 
 
