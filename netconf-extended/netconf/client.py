@@ -255,12 +255,13 @@ class NetconfClientSession(NetconfSession):
                 raise ValueError("Period must me a positive number of centiseconds")
 
         if _type == YP_ONCHANGE:
+            pass
             # optional dampening-period 
             # optional sync-on-start (send me a notification right after accepting the subscription)
             # optional excluded-change (exclude one type of change) for instance if you don't want to
             # receive notifications when an object is deleted, the value of this parameter would be "delete".
             # Posible options are create, delete, insert, move and replace.
-        pass
+            
 
 
     def send_rpc(self, rpc, timeout=None):
