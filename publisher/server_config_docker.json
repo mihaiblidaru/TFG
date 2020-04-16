@@ -1,0 +1,15 @@
+{
+    "username": "admin",
+    "password": "admin",
+    "ssh_host_key_path": "./ssh/id_rsa",
+    "port": 55555,
+    "debug": true,
+    "mongo_host": "192.168.0.1",
+    "mongo_port": 27017,
+    "mongo_db": "netconf"
+
+
+
+
+
+}
