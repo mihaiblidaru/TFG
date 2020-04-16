@@ -7,9 +7,8 @@ ADD config.py /
 ADD server_config_docker.json /
 ADD ssh/id_rsa /ssh/id_rsa
 ADD ssh/id_rsa.pub /ssh/id_rsa.pub 
-ADD netconf-extended /netconf-extended
+COPY /netconf-extended /netconf-extended
 RUN cd netconf-extended && ./buildinstall.sh
-#RUN cd netconf-extended && python3 setup.py build
 RUN pip install -r requirements.txt
 
 
