@@ -1,3 +1,6 @@
 [submodule "TFG-doc"]
 	path = TFG-doc
-	url = git@github.com:mihaiblidaru/TFG-doc.git
+	url = https://github.com/mihaiblidaru/TFG-doc.git
+[submodule "netconf-extended"]
+	path = netconf-extended
+	url = https://github.com/mihaiblidaru/netconf-extended
