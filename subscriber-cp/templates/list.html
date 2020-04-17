@@ -13,7 +13,7 @@
                 <div class="m-2">
                     <h3 class="d-inline ml-3">Hosts</h3>
                     <div class="float-right">
-                        <a class="btn btn-primary" href="{% url 'add_host' %}" role="button"><i class="mr-2 fa fa-plus-square"></i>Add Host</a>
+                        <a class="btn btn-primary" href="{% url 'open_session' %}" role="button"><i class="mr-2 fa fa-plus-square"></i>Open Session</a>
                     </div>
                 </div>
                 {% if hosts %}
@@ -22,12 +22,16 @@
                             <li class="wrapword list-group-item">
                                 <div class="d-inline align-middle">
                         <span class="font-weight-bold">
-                                <a href="{% url 'show_host' host.slug %}">{{ host.name }}</a> -
+                                <a href="{% url 'show_host' host.session_id%}"> SessionID {{ host.session_id }}</a> -
                         </span>
-                                    {{ host.ip }}:{{ host.port }} - {{ host.subscription_set.count }} subscriptions
+                                    {{ host.host }}:{{ host.port }} - 5 subscriptions
                                 </div>
                                 <div class="float-right">
-                                    <a class="btn btn-primary" href="{% url 'show_host' host.slug %}"
+                                    <a class="btn btn-primary" href="{% url 'show_host' host.session_id %}"
+                                       role="button">Edit</a>
+                                </div>
+                                <div class="float-right">
+                                    <a class="btn btn-primary" href="{% url 'show_host' host.session_id %}"
                                        role="button">Edit</a>
                                 </div>
                             </li>

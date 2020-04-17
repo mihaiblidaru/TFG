@@ -68,7 +68,7 @@ class JsonSimpleIPCClient:
         msg = b''
         while True:
             try:
-                data = conn.recv(1024)
+                data = self.s.recv(1024)
             except:
                 break
             else:
@@ -83,6 +83,10 @@ class JsonSimpleIPCClient:
                     return obj
                 else:
                     msg += data
+    
+    def close(self):
+        self.s.shutdown(1)
+        self.s.close()
 
 
 
