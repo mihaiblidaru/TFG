@@ -1,0 +1,3 @@
+[submodule "TFG-doc"]
+	path = TFG-doc
+	url = git@github.com:mihaiblidaru/TFG-doc.git
