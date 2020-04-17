@@ -1,11 +1,14 @@
 # Build the wheel locally from source
-cd ../netconf-extended/ && python3 setup.py sdist bdist_wheel && cd ~-
+cd ../netconf-extended/  
 
+wheel=$(python3 setup.py sdist bdist_wheel 2> /dev/null | grep "whl" | cut -d " " -f 2 | cut -c 2- | rev | cut -c 2- | rev) 
+echo $wheel
+cd ~-
 # Get move the wheel to current directory
-cp ../netconf-extended/dist/*py3*.whl .
+cp $wheel .
 
 # Build the container
-docker build -t publisher .
+sudo docker build -t publisher .
 
 # Remove the wheel
 rm -f *.whl
