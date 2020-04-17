@@ -7,12 +7,9 @@ ADD config.py /
 ADD server_config_docker.json /
 ADD ssh/id_rsa /ssh/id_rsa
 ADD ssh/id_rsa.pub /ssh/id_rsa.pub 
-COPY /netconf-extended /netconf-extended
-RUN cd netconf-extended && ./buildinstall.sh
+ADD *.whl /
+RUN pip install *.whl
 RUN pip install -r requirements.txt
-
-
-
 
 EXPOSE 55555
 
