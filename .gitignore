@@ -138,3 +138,5 @@ dmypy.json
 
 # do not reupload yang models
 *.yang
+.vscode
+.idea
