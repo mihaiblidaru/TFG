@@ -25,20 +25,35 @@ cd ..
 ```
 
 
-## How to build & run docker publisher module
+## How to build & run publisher-subscriber docker containers
 
 ```
-cd publisher
-# change mongo host in server_config_docker.json
-docker build -t publisher
-docker run -d publisher
+git clone https://github.com/mihaiblidaru/TFG.git
+cd TFG
+cd publisher && ./build_docker_container.sh && docker run -d publisher && cd ..
+cd subscriber && ./build_docker_container.sh && docker run -d subscriber && cd ..
 ```
+
+Check if the containers are running using `docker ps`
+```
+mihai@X3:~/TFG$ docker ps
+CONTAINER ID        IMAGE               COMMAND                  CREATED              STATUS              PORTS                  NAMES
+ff2002341328        subscriber          "docker-entrypoint.s…"   38 seconds ago       Up 37 seconds       8000/tcp, 27017/tcp    quizzical_einstein
+fbf551e1cd98        publisher           "docker-entrypoint.s…"   About a minute ago   Up About a minute   27017/tcp, 55555/tcp   mystifying_jepsen
+```
+
+
+
+
+
+
 
 # Probably usefull modules
 ```
 https://github.com/robshakir/pyangbind
 
 ```
+
 
 
 
