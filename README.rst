@@ -74,6 +74,10 @@ Auxiliary modules
 =======================
 Simple_IPC
 ------------------
+This is a module for interprocess communication using JSON as marshaling language and unix(or TCP) sockets for transport. It uses a client-server architecture where the server acts similar to a http server, it can answer requests from client but it cannot initiate the communication itself.
+
+Right now I'm using it for sending messages between the Client Daemon and the Client Control Panel, as they are separate processes.
+
 
 Probably usefull modules
 ========================
