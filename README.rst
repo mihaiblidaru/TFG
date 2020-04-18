@@ -3,18 +3,24 @@ TFG - Netconf YANG Push Server/Client
 
 .. contents:: Table of Contents
 
-Server
-------
+Components
+**********
 
-Netconf server in charge of receiving subscription related RPC such as
-establish-subscription, modify-subscription, etc, and sending the
-notification data to the subscribers. ## Client ### Client Server
-Recieves notifications and saves then into a db or file. ### Client
-Control Panel WebApp Manage subscriptions. Send establish-subscription,
-modify-subscription RPCs to clients.
+Publisher (netconf-server)
+==========================
+Netconf server with yang push capabilities. This server receives subscription related RPC such as establish-subscription, modify-subscription, etc, and sends periodic or on-change notifications based on requested subscription terms.
+
+Subscriber (netconf-client)
+===========================
+
+Client Daemon
+-------------
+
+Client Control Panel (django web-app)
+-------------------------------------
 
 Instalation
------------
+***********
 
 I assume you have cloned or downloaded this git repository and that you
 have an open bash shell and changed directory to the root folder of this
@@ -26,14 +32,15 @@ repository.
    cd TFG
 
 Instalation without docker
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+==========================
 
 ::
 
    TODO
 
 Instalation with docker
-~~~~~~~~~~~~~~~~~~~~~~~
+=======================
+.. image:: https://raw.githubusercontent.com/mihaiblidaru/TFG-doc/master/graphics/docker.png
 
 Build publisher and subscriber containers
 
@@ -58,9 +65,18 @@ Check if the containers are running using ``docker ps``
    ff2002341328        subscriber          "docker-entrypoint.s…"   38 seconds ago       Up 37 seconds       8000/tcp, 27017/tcp    quizzical_einstein
    fbf551e1cd98        publisher           "docker-entrypoint.s…"   About a minute ago   Up About a minute   27017/tcp, 55555/tcp   mystifying_jepsen
 
+Development
+***************
+
+Auxiliary modules
+=======================
+Simple_IPC
+------------------
+
 Probably usefull modules
 ========================
 
 ::
 
    https://github.com/robshakir/pyangbind
+
