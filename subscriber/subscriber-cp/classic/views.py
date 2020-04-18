@@ -12,7 +12,7 @@ def open_session(request):
         form = OpenSessionForm(request.POST)
 
         if form.is_valid():
-            client = JsonSimpleIPCClient(55554)
+            client = JsonSimpleIPCClientUnix("NetconfClientDaemon")
             res = client.send_msg_sync({"action":"open-session", "params":form.cleaned_data})
 
             if res["status"] == "ok":
