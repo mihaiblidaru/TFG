@@ -40,7 +40,9 @@ Instalation without docker
 
 Instalation with docker
 =======================
-.. image:: https://raw.githubusercontent.com/mihaiblidaru/TFG-doc/master/graphics/docker.png
+Docker architecture
+
+.. image:: https://github.com/mihaiblidaru/TFG-doc/blob/master/graphics/docker.png
 
 Build publisher and subscriber containers
 
