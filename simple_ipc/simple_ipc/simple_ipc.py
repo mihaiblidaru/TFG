@@ -1,14 +1,38 @@
 from threading import Thread, Lock
 import socket
 import json
+import tempfile
+import os
+
+TMP_DIR = tempfile.gettempdir()
 
 class JsonSimpleIPCServer:
-    def __init__(self, rec_msg_callback, port=55554):
-        self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    def __init__(self, rec_msg_callback, socket_type="tcp", port=55554, unix_socket_filename=None):
+        server_address = None
+        s_type = None
+
+        if socket_type == "tcp":
+            s_type = socket.AF_INET
+            server_address = ('0.0.0.0', port)
+        elif socket_type == "unix":
+            s_type = socket.AF_UNIX
+            if unix_socket_filename is not None:
+                server_address = os.path.join(TMP_DIR, unix_socket_filename)
+                try:
+                    os.unlink(server_address)
+                except OSError:
+                    if os.path.exists(server_address):
+                        raise
+                else:
+                    raise ValueError("unix_socket_file cannot be None when using unix sockets")
+
+        self.s = socket.socket(s_type, socket.SOCK_STREAM)
         self.s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.s.settimeout(0.2) # timeout for listening
-        self.s.bind(('0.0.0.0', port))
+        self.s.bind(server_address)
         self.s.listen(10)
+        
+
         self.keep_running = True
 
         t = Thread(name="JsonSimpleIPCServerThread", daemon=True, target=self.accept_connections)
@@ -55,11 +79,11 @@ class JsonSimpleIPCServer:
                 else:
                     msg += data
 
-class JsonSimpleIPCClient:
 
-    def __init__(self, port):
-        self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.s.connect(('localhost', port))
+
+class _JsonSimpleIPCClient:
+    def __init__(self, sock):
+        self.s = sock
 
     def send_msg_sync(self, msg_obj):
         encoded_msg = json.dumps(msg_obj).encode('utf-8') + b'\0'
@@ -88,7 +112,17 @@ class JsonSimpleIPCClient:
         self.s.shutdown(1)
         self.s.close()
 
+class JsonSimpleIPCClientTCP(_JsonSimpleIPCClient):
+    def __init__(self, port, host="127.0.0.1"):
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.connect((host, port))
+        super().__init__(sock)
 
-
+class JsonSimpleIPCClientUnix(_JsonSimpleIPCClient):
+    def __init__(self, unix_socket_filename):
+        sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        server_address = os.path.join(TMP_DIR, unix_socket_filename)
+        sock.connect(server_address)
+        super().__init__(sock)
 
 

@@ -2,7 +2,7 @@ import socket
 
 from django.shortcuts import render, redirect
 from classic.forms import AddSubscriptionForm, OpenSessionForm
-from simple_ipc import JsonSimpleIPCClient
+from simple_ipc import JsonSimpleIPCClientUnix
 
 
 def open_session(request):
@@ -40,7 +40,7 @@ def add_subscription(request, slug):
 
 def index(request):
     #hosts = Host.objects.all()
-    client = JsonSimpleIPCClient(55554)
+    client = JsonSimpleIPCClientUnix("NetconfClientDaemon")
     
     res = client.send_msg_sync({"action": "get-active-sessions"})
 

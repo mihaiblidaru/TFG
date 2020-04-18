@@ -8,7 +8,7 @@ class ClientDaemon:
 
     def __init__(self):
         self.global_read_lock = Lock()
-        self.ipc_server = JsonSimpleIPCServer(self.ipc_msg_recived)
+        self.ipc_server = JsonSimpleIPCServer(self.ipc_msg_recived, socket_type='unix', unix_socket_filename="NetconfClientDaemon")
         self.sessions = {}
         self.session_sockets = {}
 
