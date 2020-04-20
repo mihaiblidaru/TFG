@@ -82,7 +82,33 @@ Right now I'm using it for sending messages between the Client Daemon and the Cl
 Probably usefull modules
 ========================
 
-::
+Tareas
+======
 
-   https://github.com/robshakir/pyangbind
+21 de abril de 2020
+-------------------
 
+ * [ ] Hacer que funcione el panel de control para establish-subscriptions.  
+ * [ ] Terminal la función de establish-subscriptions en client.py validando todos los campos (probar rapidamente pyangbind para crear bindings de las rpcs, si no funciona lo vamos a hacer a mano con ncutils y lxlml).  
+ * [ ] Hacer que el cliente mande establish-subscriptions a servidores.  
+ * [ ] Crear hilos en cliente para guardar los datos de notificaciones en la base de datos.
+ * [ ] Implementar el cierre de sesiones desde la web en cliente (tanto front, como backend de control como en el propio cliente)
+ 
+ 22 de abril de 2020
+ -------------------
+ 
+ * [ ] Escribir 2 páginas del estado del arte
+ * [ ] Validar las peticiones de subscripciones en el servidor al 100 %
+ * [ ] Implementar anchor-time en las subscripciones periodicas
+ * [ ] Implementar las notificaciones on-change de forma básica
+ * [ ] Rellenar con datos basados en modelos yang soportados la base de datos al arrancar el servidor netconf
+ 
+ Tareas a corto plazo
+ --------------------
+ 
+ * [ ] Preguntar a Jorge que hay que poner en la parte de Desarrollo
+ 
+ Tareas a largo plazo
+ --------------------
+ 
+ * [ ] Escribir pruebas unitarias para cliente y servidor
