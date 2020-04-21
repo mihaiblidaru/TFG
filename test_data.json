@@ -1,0 +1,60 @@
+{
+	"sys:ietf-system": {
+		"sys:system": {
+			"sys:contact": "aaaaaa",
+			"sys:hostname": "bbbbbbbbb",
+			"sys:location": "cccccccc",
+			"sys:clock": {
+				"sys:timezone-utc-offset": 2
+			}
+		},
+		"sys:system-state": {
+			"sys:platform": {
+				"sys:os-name": "Ubuntu",
+				"sys:os-release": "bionic beaver",
+				"sys:os-version": "18.04",
+				"sys:machine": "X3"
+			},
+			"sys:clock": {
+				"sys:current-datetime": "2020-04-21T10:10:10Z+2",
+				"sys:boot-datetime": "2020-04-21T11:10:10Z+2"
+			}
+		}
+	}
+	
+
+	
+		"if:ietf-interfaces": {
+		"if:interfaces": {
+			"if:eth0": {
+				"if:name": "eth0",
+				"if:description": "Ethernet interface",
+				"if:type": "Ethernet",
+				"if:enabled": true,
+				"if:link-up-down-trap-enable": "enabled",
+				"if:admin-status": "up",
+				"if:oper-status": "up",
+				"if:last-change": "2020-04-21T10:10:10Z+2",
+				"if:if-index": 0,
+				"if:phys-address": "AA:AA:AA:BB:BB:BB",
+				"if:speed": 9999999,
+				"if:statistics": {
+					"discontinuity-time": "2020-04-21T10:10:10Z+2",
+					"if:in-octets": 1111,
+					"if:in-unicast-pkts": 12234,
+					"if:in-broadcast-pkts": 55555,
+					"if:in-multicast-pkts": 66666,
+					"if:in-discards": 777777,
+					"if:in-errors": 88888,
+					"if:in-unknown-protos": 1999,
+					"if:out-octets": 11000,
+					"if:out-unicast-pkts": 21234,
+					"if:out-broadcast-pkts": 21234,
+					"if:out-multicast-pkts": 21234,
+					"if:out-discards": 31234,
+					"if:out-errors": 31234
+				}
+			}
+		}
+	}
+}

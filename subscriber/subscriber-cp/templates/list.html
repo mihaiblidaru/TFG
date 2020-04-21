@@ -27,8 +27,8 @@
                                     {{ host.host }}:{{ host.port }} - 5 subscriptions
                                 </div>
                                 <div class="float-right">
-                                    <a class="btn btn-primary" href="{% url 'show_host' host.session_id %}"
-                                       role="button">Edit</a>
+                                    <a class="btn btn-primary" href="{% url 'add_subscription' host.session_id %}"
+                                       role="button">add</a>
                                 </div>
                                 <div class="float-right">
                                     <a class="btn btn-primary" href="{% url 'show_host' host.session_id %}"

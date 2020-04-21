@@ -30,12 +30,49 @@ def del_subscription(resquest, slug, sub_id):
     return redirect('show_host', slug)
 
 
-def add_subscription(request, slug):
-
+def add_subscription(request, session_id):
     if request.method == 'POST':
-        form = AddSubscriptionForm(request.POST, initial={'host_id': host.id})
+        cli_request = {}
+        cli_request['session_id'] = session_id
+        cli_request["datastore"] = request.POST['datastore']
+        selection_filter = request.POST['selection-filter']
+
+        if selection_filter == 'subtree':
+            cli_request["datastore-subtree-filter"] = request.POST["datastore-subtree-filter"]
+        else:
+            cli_request["datastore-xpath-filter"] = request.POST["datastore-xpath-filter"]
+
+        update_trigger = request.POST['update-trigger']
+
+        if update_trigger == 'periodic':
+            periodic = {}
+            periodic['period'] = int(request.POST['period'])
+            anchor_time = request.POST['anchor-time']
+            if len(anchor_time) > 0:
+                periodic['anchor-time'] = anchor_time
+            cli_request['periodic'] = periodic
+        else:
+            on_change = {}
+            dampening_period = request.POST['dampening-period']
+            if dampening_period:
+                on_change['dampening-period'] == dampening_period
+                    
+            sync_on_start = request.POST['sync-on-start']
+
+            if sync_on_start:
+                on_change['sync-on-start'] = sync_on_start
+        
+            cli_request['on_change'] = on_change
+
+        client = JsonSimpleIPCClientUnix("NetconfClientDaemon")
+        res = client.send_msg_sync({"action": "establish-subscription", "params":cli_request})
+        if res["status"] == "ok":
+            return render(request, 'add_sub.html', {'success': True, 'subscription_id': res['subscription_id']})
+        else:
+            return render(request, 'add_sub.html', {'success': False, 'error':res["msg"]})
+
     else:
-        return render(request, 'add_sub.html', {'form': form})
+        return render(request, 'add_sub.html')
 
 
 def index(request):

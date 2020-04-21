@@ -16,17 +16,14 @@
 {% block content %}
 
     <div class="container mb-5">
-
-
         <form id="add_sub_form" method="post">
-            {{ form.host_id }}
             {% csrf_token %}
             {% if success %}
                 <div class="row">
                     <div class="col-12 mt-2">
                         <div class="alert alert-success alert-dismissible" role="alert">
                             <button type="button" class="close" data-dismiss="alert">&times;</button>
-                            <h4 class="alert-heading">Subscription created successfully!</h4>
+                            <h4 class="alert-heading">Subscription with id {{subscription_id}} created successfully!</h4>
                         </div>
                     </div>
                 </div>
@@ -37,69 +34,178 @@
                     <hr/>
                 </div>
             </div>
-            <div class="row vdivide">
-                <div class="col-md-6 col-sm-12">
-                    <div class="form-group ">
-                        <label class="control-label requiredField" for="name">
-                            {{ form.type.label }}
-                            <span class="asteriskField">
-                            *
-                        </span>
-                        </label>
-                        {{ form.type }}
-                        {{ form.type.errors }}
-                    </div>
-                    <div class="form-group ">
-                        <label class="control-label requiredField" for="keywords">
-                            {{ form.data.label }}
-                            <span class="asteriskField">
-                            *
-                        </span>
-                        </label>
-                        {{ form.data }}
-                        {{ form.data.errors }}
-                    </div>
-                    <div class="form-group ">
-                        <label class="control-label requiredField" for="keywords">
-                            {{ form.interval.label }}
-                            <span class="asteriskField">
-                            *
-                        </span>
-                        </label>
-                        {{ form.interval }}
-                        {{ form.interval.errors }}
-                    </div>
-
+            <div class="row" id="datastore" id="datastore">
+                <div class="col-xl-12" >
+                    <label>Datastore: <input class="pl-2" id="datastore-input" ype="text" name="datastore" value="running"></label>
                 </div>
+                
+                <div id="selection-filter" class="col-xl-12" > 
+                    <p>Selection filter:</p>
+                    <div class="ml-5">
+                        <div>
+                            <label>
+                                <input type="radio" name="selection-filter" value="subtree" id="datastore-subtree-filter-radio">
+                                datastore-subtree-filter
+                            </label>
+
+                            <fieldset id="datastore-subtree-fieldset" class="ml-5" disabled>
+                                <label >
+                                    Subtree:
+                                <input class="pl-2" name="datastore-subtree-filter" id="datastore-subtree-filter-input" type="text">
+                                </label>
+                            </fieldset>
+                        </div>
+
+                        <div>
+                            <label >
+                                <input type="radio" name="selection-filter" value="xpath" id="datastore-xpath-filter-radio" checked>
+                                datastore-xpath-filter
+                            </label>
+                            <fieldset id="datastore-xpath-fieldset" class="ml-5" enabled>
+                                <label >
+                                    XPath:
+                                <input class="pl-2" name="datastore-xpath-filter" id="datastore-xpath-filter-input" type="text">
+                                </label>
+                            </fieldset>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" id="update-trigger">
+                <div class="col-xl-12">
+                    <p>Update Trigger:</p>
+                    <div class="ml-5">
+                        <div>
+                            <label>
+                                <input type="radio" name="update-trigger" value="periodic" id="periodic-radio" checked>
+                                periodic
+                            </label>
+    
+                            <fieldset id="periodic-fieldset" class="ml-5">
+                                <div class="form-group ">
+                                    <label class="control-label requiredField" for="name">
+                                        Period
+                                        <span class="asteriskField">
+                                        *
+                                    </span>
+                                    </label>
+                                    <input class="pl-2" type="number" name="period" id="period-input">
+                                </div>
+                                <div class="form-group ">
+                                    <label class="control-label requiredField" for="name">
+                                        Anchor-time
+                                        </label>
+                                    <input class="pl-2" type="datetime-local" id="anchor-time-input" step="1" name="anchor-time" id="anchor-time">
+                                </div>
+                            </fieldset>
+                        </div>
+                    </div>
+                    <div class="ml-5">
+                        <div>
+                            <label>
+                                <input type="radio" name="update-trigger" value="on-change" id="on-change-radio">
+                                on-change
+                            </label>
+    
+                            <fieldset id="on-change-fieldset" class="ml-5" disabled>
+                                <div class="form-group ">
+                                    <label class="control-label requiredField" for="name">
+                                        dampening-period
+                                    </label>
+                                    <input class="pl-2" type="number" name="dampening-period" id="dampening-period-input">
+                                </div>
+                                <div class="form-group ">
+                                    <label class="control-label requiredField" for="name">
+                                        sync-on-start
+                                        </label>
+                                        <input type="checkbox" name="sync-on-start" value="True" id="sync-on-start-input">
+                                </div>
+                            </fieldset>
+                        </div>
+                    </div>
+                </div>
+ 
 
             </div>
+
+
             <div class="row">
                 <div class="col-md-2 col-sm-3">
                     <div class="form-group">
                         <div>
-                            {% if error_captcha %}
-                                <div class="ml-2 text-danger">
-                                    <strong>Invalid captcha</strong>
-                                </div>
-                            {% endif %}
-                            <div class="g-recaptcha mb-2" data-expired-callback="recaptchaExpiredCallback"
-                                 data-callback="recaptchaCallback"
-                                 data-sitekey="6LcdzX8UAAAAALkUmz3d-936n7_mEd2jC8tYJ1ii"></div>
-
-                            <button class="btn btn-primary btn-block" name="submit_workflow" type="submit">
+                            <button id="submit-btn" class="btn btn-primary btn-block" name="submit_subscription" type="submit">
                                 Submit
                             </button>
                         </div>
                     </div>
-
                 </div>
             </div>
-
-
         </form>
     </div>
-    </div>
 
+<script>
+    ds_fieldset = $("#datastore-subtree-fieldset");
+    dx_fieldset = $("#datastore-xpath-fieldset");
+
+    ds_radio = $("#datastore-subtree-filter-radio");
+    dx_radio = $("#datastore-xpath-filter-radio");
+
+    ds_radio.change(function () {
+        ds_fieldset.prop("disabled", false);
+        dx_fieldset.prop("disabled", true);
+    });
+    dx_radio.change(function () {
+        ds_fieldset.prop("disabled", true);
+        dx_fieldset.prop("disabled", false);
+    });
+
+    periodic_fieldset = $("#periodic-fieldset");
+    on_change_fieldset = $("#on-change-fieldset");
+
+    periodic_radio = $("#periodic-radio");
+    on_change_radio = $("#on-change-radio");
+
+    periodic_radio.change(function () {
+        periodic_fieldset.prop("disabled", false);
+        on_change_fieldset.prop("disabled", true);
+    });
+    on_change_radio.change(function () {
+        periodic_fieldset.prop("disabled", true);
+        on_change_fieldset.prop("disabled", false);
+    });
+
+
+    /*$("#submit-btn").click(
+        function buildEstablishSubscriptionRequest() {
+            let res = {}
+
+            res["datastore"] = $("#datastore-input").val();
+ 
+            if(!ds_fieldset.prop("disabled")){
+                res["datastore-subtree-filter"] = $("#datastore-subtree-filter-input").val();
+            }else{
+                res["datastore-xpath-filter"] = $("#datastore-xpath-filter-input").val();
+            }
+
+            if(!periodic_fieldset.prop("disabled")){
+                periodic = {};
+                periodic["period"] = parseInt($("#period-input").val());
+                periodic["anchor-time"] = $("#anchor-time-input").val();
+                res["periodic"] = periodic
+            }else{
+                on_change = {};
+                on_change["dampening-period"] = $("#dampening-period-input").val();
+                on_change["sync-on-start"] = $("#sync-on-start-input").prop("checked");
+                res["on-change"] = on_change
+            }
+            console.log(res);
+        }
+    );*/
+
+
+
+
+</script>
 
 
 

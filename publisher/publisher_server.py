@@ -155,7 +155,7 @@ class PublisherServer:
 
         if sub_type == Subscription.PERIODIC:
             sid = self.get_next_sub_id()
-            sub = Subscription(sid, sub_type, datastore, xpath_filter, interval=period,
+            sub = Subscription(sid, sub_type, datastore, period=period, datastore_xpath_filter=xpath_filter,
                                raw=ET.tostring(rpc, pretty_print=True).decode('utf8'))
             self.subscriptions[sid] = sub
 
