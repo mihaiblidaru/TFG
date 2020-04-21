@@ -89,7 +89,7 @@ Tareas
 -------------------
 
  * [X] Hacer que funcione el panel de control para establish-subscriptions.  
- * [ ] Terminal la función de establish-subscriptions en client.py validando todos los campos (probar rapidamente pyangbind para crear bindings de las rpcs, si no funciona lo vamos a hacer a mano con ncutils y lxlml).  
+ * [X] Terminal la función de establish-subscriptions en client.py validando todos los campos (probar rapidamente pyangbind para crear bindings de las rpcs, si no funciona lo vamos a hacer a mano con ncutils y lxlml).  
  * [X] Hacer que el cliente mande establish-subscriptions a servidores.  
  * [X] Crear hilos en cliente para guardar los datos de notificaciones en la base de datos.
  * [ ] Implementar el cierre de sesiones desde la web en cliente (tanto front, como backend de control como en el propio cliente)
