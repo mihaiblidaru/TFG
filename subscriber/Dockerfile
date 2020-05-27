@@ -14,9 +14,10 @@ RUN mkdir -p /data/db2 \
 
 #ADD requirements.txt /
 #RUN pip3 install -r requirements.txt
+
 ADD netconf-extended/ /netconf-extended
 WORKDIR /netconf-extended
-
+RUN pip3 install -r requirements.txt
 RUN python3 setup.py install
 
 ADD subscriber/supervisor.conf /etc/supervisor.conf
