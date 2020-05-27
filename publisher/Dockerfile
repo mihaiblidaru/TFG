@@ -18,6 +18,7 @@ RUN pip3 install -r requirements.txt
 ADD netconf-extended/ /netconf-extended
 WORKDIR /netconf-extended
 RUN pip3 install -r requirements.txt
+RUN python3 setup.py build
 RUN python3 setup.py install
 
 ADD publisher/supervisor.conf /etc/supervisor.conf
