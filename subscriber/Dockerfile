@@ -14,15 +14,17 @@ RUN mkdir -p /data/db2 \
 
 #ADD requirements.txt /
 #RUN pip3 install -r requirements.txt
-ADD *.whl /
-RUN pip3 install *.whl
+ADD netconf-extended/ /netconf-extended
+WORKDIR /netconf-extended
 
-ADD supervisor.conf /etc/supervisor.conf
-ADD ssh/id_rsa /ssh/id_rsa
-ADD client_daemon.py /
-ADD ssh/id_rsa.pub /ssh/id_rsa.pub
+RUN python3 setup.py install
+
+ADD subscriber/supervisor.conf /etc/supervisor.conf
+ADD subscriber/ssh/id_rsa /ssh/id_rsa
+ADD subscriber/client_daemon.py /
+ADD subscriber/ssh/id_rsa.pub /ssh/id_rsa.pub
 ADD simple_ipc /simple_ipc
-ADD subscriber-cp /subscriber-cp
+ADD subscriber/subscriber-cp /subscriber-cp
 WORKDIR /subscriber-cp
 RUN pip3 install -r requirements.txt
 WORKDIR /simple_ipc

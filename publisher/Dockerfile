@@ -12,19 +12,21 @@ RUN mkdir -p /data/db2 \
     && echo "bind_ip = 0.0.0.0" >> /etc/mongodb.conf \
     && chown -R mongodb:mongodb /data/db2
 
-ADD requirements.txt /
+ADD publisher/requirements.txt /
 RUN pip3 install -r requirements.txt
-ADD *.whl /
-RUN pip3 install *.whl
+ADD netconf-extended/ /netconf-extended
+WORKDIR /netconf-extended
 
-ADD supervisor.conf /etc/supervisor.conf
-ADD start_server.py /
-ADD publisher_server.py /
-ADD notifications.py /
-ADD config.py /
-ADD server_config_docker.json /
-ADD ssh/id_rsa /ssh/id_rsa
-ADD ssh/id_rsa.pub /ssh/id_rsa.pub
+RUN python3 setup.py install
+
+ADD publisher/supervisor.conf /etc/supervisor.conf
+ADD publisher/start_server.py /
+ADD publisher/publisher_server.py /
+ADD publisher/notifications.py /
+ADD publisher/config.py /
+ADD publisher/server_config_docker.json /
+ADD publisher/ssh/id_rsa /ssh/id_rsa
+ADD publisher/ssh/id_rsa.pub /ssh/id_rsa.pub
 EXPOSE 55555
 
 # Expose MongoDB port for testing
