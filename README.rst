@@ -47,16 +47,16 @@ Docker architecture
 Build publisher and subscriber containers
 
 :: 
-
-   cd publisher && ./build_docker_container.sh && cd ..
-   cd subscriber && ./build_docker_container.sh && && cd ..
+   # Run in TFG directory
+   sudo docker build -f publisher/Dockerfile -t publisher . 
+   sudo docker build -f subscriber/Dockerfile -t subscriber .
 
 Start docker containers using ``docker run``
 
 ::
 
-   docker run -d publisher
-   docker run -d subscriber
+   sudo docker run -d publisher
+   sudo docker run -d subscriber
 
 Check if the containers are running using ``docker ps``
 
