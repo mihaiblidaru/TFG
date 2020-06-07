@@ -47,6 +47,7 @@ Docker architecture
 Build publisher and subscriber containers
 
 :: 
+
    # Run in TFG directory
    sudo docker build -f publisher/Dockerfile -t publisher . 
    sudo docker build -f subscriber/Dockerfile -t subscriber .
