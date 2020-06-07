@@ -5,12 +5,11 @@ import threading
 import time
 from datetime import datetime
 import json
-import xmljson
 import logging
 import traceback
+from datasource import DataSource
 
 logger = logging.getLogger("publisher")
-
 
 def every(delay, task):
   next_time = time.time() + delay
@@ -26,7 +25,6 @@ def every(delay, task):
     next_time += (time.time() - next_time) // delay * delay + delay
 
 class Subscription():
-
     PERIODIC = 'periodic'
     ON_CHANGE = 'on_change'
 
@@ -71,56 +69,51 @@ class OnChangeNotificationThread:
 
 class PeriodicNotificationThread:
 
-    def __init__(self, sub, db, session):
+    def __init__(self, sub: Subscription, datasource: DataSource, session):
 
         self.keep_active = True
+        self.datasource = datasource
+        self.session = session
+        self.sub = sub
 
-        thread = threading.Thread(target=self.send_periodic_notification, args=(sub, db, session), name=f"PeriodicNotificationThread{sub.session_id}")
+        thread = threading.Thread(target=self.send_periodic_notification, name=f"PeriodicNotificationThread{sub.session_id}")
         # 
         thread.setDaemon(True)
         thread.start()
     
-    def send_notification(self, session, sub, db):
-        logger.debug(f"Sending notification for subid {sub.session_id}")
+    def send_notification(self):
+        logger.debug(f"Sending notification for subid {self.sub.session_id}")
         push_update = ncutil.elm("yp:push-update")
 
         # Set notification id
-        ncutil.subelm(push_update, "id").text = str(sub.session_id)
+        ncutil.subelm(push_update, "id").text = str(self.sub.session_id)
         datastore_contents = ncutil.subelm(push_update, "datastore-contents")
 
-        if sub.datastore_xpath_filter:
-
-            # #Vamos a suponer de momento de trabajamos con una sola coleccion y un único documento
-            # doc = db['data'].find_one()
+        if self.sub.datastore_xpath_filter:
+            notif_data = self.datasource.get_data(self.sub.datastore_xpath_filter)
             
-            # xml_doc = xmljson.parker.etree(doc, root=ET.Element("root"))
-            # xpath_real = "/root/" + sub.datastore_xpath_filter
-            # notif_data = xml_doc.xpath(xpath_real)
-            # for elem in notif_data:
-            #     datastore_contents.append(elem)
-
-            datastore_contents.append(ncutil.leaf_elm("test", 123456789))
+            for elem in notif_data:
+                datastore_contents.append(elem)
+            #datastore_contents.append(ncutil.leaf_elm("test", 123456789))
 
         print(ET.tounicode(push_update, pretty_print=True))
 
-        # # TODO: do not access the low level method directly
-        session.send_notification(push_update)
+        self.session.send_notification(push_update)
 
 
-    def send_periodic_notification(self, sub, db, session):
+    def send_periodic_notification(self):
         logger.debug("New periodic subscription thread started")
-        delay = sub.period_seconds
+        delay = self.sub.period_seconds
 
         next_time = time.time() + delay
         while self.keep_active:
             # If the session is still open send notification
-            if session.session_open:
+            if self.session.session_open:
                 time.sleep(max(0, next_time - time.time()))
                 try:
-                    self.send_notification(session, sub, db)
+                    self.send_notification()
                 except Exception:
                     traceback.print_exc()
-                
                 next_time += (time.time() - next_time) // delay * delay + delay
             else:
                 self.keep_active = False

@@ -1,35 +1,34 @@
-import json
+import os
 from threading import Lock
+from typing import Optional
 import netconf.util as ncutil
-from lxml import etree as ET
+from lxml import etree
 from netconf import nsmap_update, server
-from config import read_json_config_file
+import config as cfg
 
 from notifications import Subscription
 from notifications import PeriodicNotificationThread
 
-from pymongo import MongoClient
-from pymongo import MongoClient
 
+from datasource import MongoDataSource
 import logging
 
-logger = None
+logger: Optional[logging.Logger] = None
 
 # TODO model namespace??
 MODEL_NS = "urn:my-urn:my-model"
 
-nsmap_update({'pfx': MODEL_NS, 'yp': 'urn:ietf:params:xml:ns:yang:ietf-yang-push'})
+nsmap_update(
+    {'pfx': MODEL_NS,
+     'yp': 'urn:ietf:params:xml:ns:yang:ietf-yang-push'})
+
 
 class PublisherServer:
-    def __init__(self, config_file='server_config.json'):
-        
+    def __init__(self, config_file=''):
         """
         :param config_file: server config file path
-        :param debug:
         """
-        # read configuration
-        cfg = read_json_config_file(config_file)
-        
+
         # Set up logger
         global logger
         logger = logging.getLogger('publisher')
@@ -44,35 +43,41 @@ class PublisherServer:
         ch = logging.StreamHandler()
         ch.setLevel(ch_level)
 
-        formatter = logging.Formatter('%(asctime)s %(name)s %(threadName)s %(levelname)s: %(message)s')
+        formatter = logging.Formatter(
+            '%(asctime)s %(name)s %(threadName)s %(levelname)s: %(message)s')
         fh.setFormatter(formatter)
         ch.setFormatter(formatter)
 
         logger.addHandler(fh)
         logger.addHandler(ch)
-        
+
         self.subscriptions = {}
         self.last_subscription_id = 0
         self.port = cfg.port
         self.debug = cfg.debug
         self._storage_file_lock = Lock()
 
-        self.client = MongoClient(f"mongodb://{cfg.mongo_host}:{cfg.mongo_port}/?readPreference=primary&appname=netconf-publisher&ssl=false", serverSelectionTimeoutMS=2000)
+
+        self.datasource = None 
+
         
-        # Test mongoDB connection. Fails if could not connect to any mongodb server and raises an exception
         try:
-            self.client.server_info()
+            self.datasource = MongoDataSource(cfg.mongo_host, cfg.mongo_port, cfg.mongo_db, cfg.mongo_collection)
         except Exception as e:
             logger.error(f"MongoDB error: {e}")
             raise e
-        self.db = self.client[cfg.mongo_db]
+
+        if not os.path.isabs(cfg.ssh_host_key_path):
+            cfg.ssh_host_key_path = os.path.join(
+                os.path.dirname(config_file), cfg.ssh_host_key_path)
 
         # Authentication
         #
         # There are two available authentication methods:
         #    1. User and password (used now), allowing only one user (no way to establish access rules)
         #    2. SSH authorized keys. A list of the allowed clients public keys
-        auth_controller = server.SSHUserPassController(username=cfg.username, password=cfg.password)
+        auth_controller = server.SSHUserPassController(
+            username=cfg.username, password=cfg.password)
 
         server.NetconfSSHServer(server_ctl=auth_controller,
                                 server_methods=self,
@@ -81,7 +86,6 @@ class PublisherServer:
                                 debug=cfg.debug)
 
         logger.info(f"Server started on port {self.port}")
-
 
     def nc_append_capabilities(self, caps):
         # TODO netconf server capabilities
@@ -126,19 +130,22 @@ class PublisherServer:
         |             {replay}?
         """
         # We have recieved an establish-subscription rpc
-        # TODO validate more fields from the RPC 
+        # TODO validate more fields from the RPC
 
         logger.info("Received establish-subscription RPC")
 
         sub_type = None
 
+        sid: int = -1
+        sub = None
         root = rpc[0]
         nsmap = rpc[0].nsmap
 
         periodic_elm = root.find('yp:periodic', nsmap)
         on_change_elm = root.find('yp:on-change', nsmap)
         datastore_elm = root.find('yp:datastore', nsmap)
-        datastore_xpath_filter_elm = root.find('yp:datastore-xpath-filter', nsmap)
+        datastore_xpath_filter_elm = root.find(
+            'yp:datastore-xpath-filter', nsmap)
 
         if periodic_elm is not None:
             period_elm = periodic_elm.find('yp:period', nsmap)
@@ -156,20 +163,24 @@ class PublisherServer:
         if sub_type == Subscription.PERIODIC:
             sid = self.get_next_sub_id()
             sub = Subscription(sid, sub_type, datastore, period=period, datastore_xpath_filter=xpath_filter,
-                               raw=ET.tostring(rpc, pretty_print=True).decode('utf8'))
+                               raw=etree.tostring(rpc, pretty_print=True).decode('utf8'))
             self.subscriptions[sid] = sub
 
         # Generate response
-        res_map = {None: 'urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications'}
+        res_map = {
+            None: 'urn:ietf:params:xml:ns:yang:ietf-subscribed-notifications'}
 
         # id tag containing the subscription id
-        res = ET.Element('id', nsmap=res_map)
+        res = etree.Element('id', nsmap=res_map)
         res.text = str(sid)
-        
-        logger.debug(ET.tostring(rpc, pretty_print=True).decode('utf8'))
-        logger.debug(ET.tostring(res, pretty_print=True).decode('utf8'))
 
-        PeriodicNotificationThread(sub, self.db, session)
+        logger.debug(etree.tostring(rpc, pretty_print=True).decode('utf8'))
+        logger.debug(etree.tostring(res, pretty_print=True).decode('utf8'))
+
+        if self.datasource.xpath_exists(sub.datastore_xpath_filter):
+            raise ValueError("XPath does not correspond to any data")
+
+        PeriodicNotificationThread(sub, self.datasource, session)
 
         return res
 

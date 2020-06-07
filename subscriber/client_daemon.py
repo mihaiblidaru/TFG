@@ -22,7 +22,7 @@ class ClientDaemon:
         while True:
             try:
                 notif, aaaa = session.get_notification(subscription_id)
-                print(etree.tounicode(notif, pretty_print=True), end="\n\n")
+                print(etree.tounicode(aaaa, pretty_print=True), end="\n\n")
             except Exception as e:
                 traceback.print_exc()
                 break
