@@ -4,25 +4,27 @@ from netconf import nsmap_update, server
 import threading
 import time
 from datetime import datetime
+import math
 import json
 import logging
 import traceback
 from datasource import DataSource
 
+
 logger = logging.getLogger("publisher")
 
-def every(delay, task):
-  next_time = time.time() + delay
-  while True:
-    time.sleep(max(0, next_time - time.time()))
-    try:
-      task()
-    except Exception:
-      traceback.print_exc()
-      # in production code you might want to have this instead of course:
-      # logger.exception("Problem while executing repetitive task.")
-    # skip tasks if we are behind schedule:
-    next_time += (time.time() - next_time) // delay * delay + delay
+# def every(delay, task):
+#   next_time = time.time() + delay
+#   while True:
+#     time.sleep(max(0, next_time - time.time()))
+#     try:
+#       task()
+#     except Exception:
+#       traceback.print_exc()
+#       # in production code you might want to have this instead of course:
+#       # logger.exception("Problem while executing repetitive task.")
+#     # skip tasks if we are behind schedule:
+#     next_time += (time.time() - next_time) // delay * delay + delay
 
 class Subscription():
     PERIODIC = 'periodic'
@@ -44,7 +46,7 @@ class Subscription():
         if subscription_type == Subscription.PERIODIC:
             self.period = kwargs['period']
             self.period_seconds = self.period / 100.0
-        
+
         if 'raw' in kwargs:
             self.raw = kwargs['raw']
 
@@ -94,18 +96,30 @@ class PeriodicNotificationThread:
             
             for elem in notif_data:
                 datastore_contents.append(elem)
-            #datastore_contents.append(ncutil.leaf_elm("test", 123456789))
-
-        print(ET.tounicode(push_update, pretty_print=True))
+                
+        #print(ET.tounicode(push_update, pretty_print=True))
 
         self.session.send_notification(push_update)
-
 
     def send_periodic_notification(self):
         logger.debug("New periodic subscription thread started")
         delay = self.sub.period_seconds
 
-        next_time = time.time() + delay
+        current_timestamp = time.time()
+        next_time = current_timestamp + delay
+        # If we have an anchor time, the first notification's timestamp is computed differently
+        if self.sub.anchor_time:
+            # Convert datetime to timestamp
+            anchor_timestamp = datetime.timestamp(datetime.strptime(self.sub.anchor_time, "%Y-%m-%dT%H:%M:%S"))
+
+            if anchor_timestamp < current_timestamp:
+                # If the anchor is in the past, we carefully align the sending of the first notification as if
+                # we started sending notification at the anchor moment
+                next_time = anchor_timestamp + (math.ceil((current_timestamp - anchor_timestamp) * 100 / delay) * delay) / 100
+            else:
+                # If the anchor is in the future, we will send the first notification at that moment
+                next_time = anchor_timestamp
+
         while self.keep_active:
             # If the session is still open send notification
             if self.session.session_open:

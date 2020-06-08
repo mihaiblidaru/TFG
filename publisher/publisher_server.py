@@ -151,6 +151,13 @@ class PublisherServer:
             period_elm = periodic_elm.find('yp:period', nsmap)
             period = int(period_elm.text)
             sub_type = Subscription.PERIODIC
+
+            anchor_time_elm = periodic_elm.find('yp:anchor-time', nsmap)
+            anchor_time = None
+            if anchor_time_elm is not None:
+                anchor_time = anchor_time_elm.text
+
+
         elif on_change_elm is not None:
             sub_type = Subscription.ON_CHANGE
         else:
@@ -163,7 +170,7 @@ class PublisherServer:
         if sub_type == Subscription.PERIODIC:
             sid = self.get_next_sub_id()
             sub = Subscription(sid, sub_type, datastore, period=period, datastore_xpath_filter=xpath_filter,
-                               raw=etree.tostring(rpc, pretty_print=True).decode('utf8'))
+                               raw=etree.tostring(rpc, pretty_print=True).decode('utf8'), anchor_time=anchor_time)
             self.subscriptions[sid] = sub
 
         # Generate response
@@ -177,7 +184,7 @@ class PublisherServer:
         logger.debug(etree.tostring(rpc, pretty_print=True).decode('utf8'))
         logger.debug(etree.tostring(res, pretty_print=True).decode('utf8'))
 
-        if self.datasource.xpath_exists(sub.datastore_xpath_filter):
+        if not self.datasource.xpath_exists(sub.datastore_xpath_filter):
             raise ValueError("XPath does not correspond to any data")
 
         PeriodicNotificationThread(sub, self.datasource, session)

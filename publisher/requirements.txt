@@ -1,3 +1,5 @@
-pymongo
-xmljson
+pymongo~=3.10.1
+xmljson~=0.2.0
 pyangbind
+lxml~=4.5.0
+netconf~=2.1.1.dev4

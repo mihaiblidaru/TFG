@@ -13,27 +13,59 @@
                 <div class="m-2">
                     <h3 class="d-inline ml-3">Hosts</h3>
                     <div class="float-right">
-                        <a class="btn btn-primary" href="{% url 'open_session' %}" role="button"><i class="mr-2 fa fa-plus-square"></i>Open Session</a>
+                        <a class="btn btn-success {{error|yesno:'disabled,'}}" href="{% url 'open_session' %}" role="button"><i class="mr-2 fa fa-plus-square"></i>Open Session</a>
                     </div>
                 </div>
-                {% if hosts %}
+                {% if sessions %}
                     <ul class="list-group">
-                        {% for host in hosts %}
+                        {% for sess in sessions %}
                             <li class="wrapword list-group-item">
                                 <div class="d-inline align-middle">
                         <span class="font-weight-bold">
-                                <a href="{% url 'show_host' host.session_id%}"> SessionID {{ host.session_id }}</a> -
+                                <a href="{% url 'show_host' sess.session_id%}"> SessionID {{sess.session_id}}</a> -
                         </span>
-                                    {{ host.host }}:{{ host.port }} - 5 subscriptions
+                                {{sess.host}}:{{sess.port}} - {{sess.subscriptions|length}} active subscription(s)
                                 </div>
-                                <div class="float-right">
-                                    <a class="btn btn-primary" href="{% url 'add_subscription' host.session_id %}"
-                                       role="button">add</a>
+                                <div class="float-right ml-1">
+                                    <a class="btn btn-secondary" href="{% url 'add_subscription' sess.session_id %}"
+                                       role="button">Add Subscription <i class="fas fa-plus-square"></i></a>
                                 </div>
-                                <div class="float-right">
-                                    <a class="btn btn-primary" href="{% url 'show_host' host.session_id %}"
-                                       role="button">Edit</a>
+                                <div class="float-right ml-1">
+                                    <a class="btn btn-danger" href="{% url 'close_session' sess.session_id %}"
+                                       role="button">Close <i class="fas fa-sign-out-alt"></i></a>
                                 </div>
+                                <div class="float-right ml-1">
+                                    <a class="btn btn-primary" href="{% url 'show_host' sess.session_id %}"
+                                       role="button">Details <i class="fas fa-info-circle"></i></a>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+
+                <div class="m-2 mt-5">
+                    <h3 class="d-inline ml-3">Host you connected before</h3>
+                </div>
+
+                {% if known_hosts %}
+                    <ul class="list-group">
+                        {% for host in known_hosts %}
+                            <li class="wrapword list-group-item">
+                                <div class="d-inline align-middle">
+                                <span class="font-weight-bold">
+                                        <a href="#">{{ host.host }}:{{host.port}}</a> -
+                                </span>
+                                    Username: {{ host.username }} - Password: {{host.password}}
+                                </div>
+                                <div class="float-right ml-1">
+                                    <a class="btn btn-success" href="{% url 'open_session_known_host' host.id %}"
+                                       role="button"><i class="fas fa-plus-square"></i> Open Session</i></a>
+                                </div>
+                                <div class="float-right ml-1">
+                                    <a class="btn btn-danger" href="{% url 'delete_known_host' host.id %}"
+                                       role="button">Delete <i class="fas fa-trash"></i></a>
+                                </div>
+
                             </li>
                         {% endfor %}
                     </ul>

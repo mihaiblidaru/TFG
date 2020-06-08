@@ -3,10 +3,30 @@ import socket
 from django.shortcuts import render, redirect
 from classic.forms import AddSubscriptionForm, OpenSessionForm
 from simple_ipc import JsonSimpleIPCClientUnix
+from data.models import KnownHost
 
+def close_session(request, session_id):
+    client = JsonSimpleIPCClientUnix("NetconfClientDaemon")
+    client.send_msg_sync({"action":"close-session", "params":{"session_id": session_id}})
+    return redirect('index')
 
-def open_session(request):
-    form = OpenSessionForm()
+def delete_known_host(request, known_host_id):
+    KnownHost.objects.get(id=known_host_id).delete()
+    return redirect('index')
+
+def open_session(request, known_host_id=None):
+    initial = None
+    if known_host_id:
+        known_host = KnownHost.objects.get(id=known_host_id)
+        initial = {
+            'host': known_host.host,
+            'port': known_host.port,
+            'username': known_host.username,
+            'password': known_host.password
+        }
+        
+
+    form = OpenSessionForm(initial=initial)
 
     if request.method == 'POST':
         form = OpenSessionForm(request.POST)
@@ -14,6 +34,11 @@ def open_session(request):
         if form.is_valid():
             client = JsonSimpleIPCClientUnix("NetconfClientDaemon")
             res = client.send_msg_sync({"action":"open-session", "params":form.cleaned_data})
+
+            try:
+                KnownHost(**form.cleaned_data).save()
+            except:
+                pass
 
             if res["status"] == "ok":
                 return render(request, 'open_session.html', {'success': True, 'form': form})
@@ -76,16 +101,16 @@ def add_subscription(request, session_id):
 
 
 def index(request):
-    #hosts = Host.objects.all()
-    client = JsonSimpleIPCClientUnix("NetconfClientDaemon")
-    
-    res = client.send_msg_sync({"action": "get-active-sessions"})
+    try:
+        client = JsonSimpleIPCClientUnix("NetconfClientDaemon")
+    except:
+        return render(request, 'list.html', {"error": "Could not connect to netconf client daemon. Check if active and reload."})
+    res = client.send_msg_sync({"action": "get-full-client-info"})
 
-    _dict = {
-        'hosts': res
-    }
+    _dict = {'sessions': res, 'known_hosts': KnownHost.objects.all()}
+
     return render(request, 'list.html', _dict)
-
+    
 
 def show_host(request, slug):
     host = Host.objects.get(slug=slug)

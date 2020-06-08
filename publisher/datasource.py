@@ -2,6 +2,9 @@ from pymongo import MongoClient
 from abc import ABCMeta
 from lxml import etree
 import xmljson
+import logging
+
+logger = logging.getLogger("publisher")
 
 class DataSource:
     __metaclass__ = ABCMeta
