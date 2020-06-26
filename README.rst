@@ -1,5 +1,6 @@
 TFG - Netconf YANG Push Server/Client
 #####################################
+.. image:: https://github.com/mihaiblidaru/TFG/workflows/Docker%20Build%20Publisher/badge.svg
 
 .. contents:: Table of Contents
 
